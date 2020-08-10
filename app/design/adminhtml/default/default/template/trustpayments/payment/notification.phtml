@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * Trust Payments Magento 1
+ *
+ * This Magento extension enables to process payments with Trust Payments (https://www.trustpayments.com//).
+ *
+ * @package TrustPayments_Payment
+ * @author customweb GmbH (http://www.customweb.com/)
+ * @license http://www.apache.org/licenses/LICENSE-2.0  Apache Software License (ASL 2.0)
+ */
+
+/* @var TrustPayments_Payment_Block_Adminhtml_Notification $block */
+$block = $this;
+
+/* @var TrustPayments_Payment_Helper_Data $helper */
+$helper = $block->helper('trustpayments_payment');
+
+$numberOfManualTasks = $block->getNumberOfManualTasks();
+$totalNumberOfManualTasks = array_sum($numberOfManualTasks);
+?>
+
+<?php if ($block->isAdminNotificationEnabled() && $totalNumberOfManualTasks > 0) : ?>
+    <div class="notification-global notification-global-notice">
+        <span class="f-right">
+            <?php if (count($numberOfManualTasks) == 1) : ?>
+                <a
+                    href="<?php echo $block->escapeHtml($block->getManualTasksUrl(key($numberOfManualTasks))) ?>"
+                    target="_blank">
+                    <?php echo $block->escapeHtml($helper->__('View in Trust Payments')) ?>
+                </a>
+            <?php else : ?>
+                <a
+                    href="<?php echo $block->escapeHtml($block->getManualTasksUrl()) ?>"
+                    target="_blank">
+                    <?php echo $block->escapeHtml($helper->__('View in Trust Payments')) ?>
+                </a>
+            <?php endif; ?>
+        </span>
+        <strong><?php echo $block->escapeHtml($helper->__('Trust Payments:')) ?></strong>
+        <?php if ($totalNumberOfManualTasks == 1) : ?>
+            <?php echo $block->escapeHtml($helper->__('There is a manual task that needs your attention.')) ?>
+        <?php else : ?>
+            <?php echo $block->escapeHtml(
+                $helper->__(
+                   'There are %s manual tasks that need your attention.',
+                    $totalNumberOfManualTasks
+                )
+            ) ?>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>

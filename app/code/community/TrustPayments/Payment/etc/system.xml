@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * Trust Payments Magento 1
+ *
+ * This Magento extension enables to process payments with Trust Payments (https://www.trustpayments.com//).
+ *
+ * @package TrustPayments_Payment
+ * @author customweb GmbH (http://www.customweb.com/)
+ * @license http://www.apache.org/licenses/LICENSE-2.0  Apache Software License (ASL 2.0)
+ */
+-->
+<config>
+	<tabs></tabs>
+	<sections>
+		<trustpayments_payment translate="label" module="trustpayments_payment">
+			<class>separator-top</class>
+			<label>Trust Payments Payment</label>
+			<tab>sales</tab>
+			<frontend_type>text</frontend_type>
+			<sort_order>900</sort_order>
+			<show_in_default>1</show_in_default>
+			<show_in_website>1</show_in_website>
+			<show_in_store>1</show_in_store>
+			<groups>
+				<information translate="label">
+					<label>Information</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>5</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<comment><![CDATA[If you need help setting up the Trust Payments extension, check out the <a href="https://plugin-documentation.ep.trustpayments.com/TrustPayments/magento-1/1.0.67/docs/en/documentation.html" target="_blank">documentation</a>.]]></comment>
+					<fields>
+						<version translate="label">
+							<label>Module Version</label>
+							<frontend_type>label</frontend_type>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</version>
+						<sdk_version translate="label">
+							<label>Trust Payments SDK Version</label>
+							<frontend_type>label</frontend_type>
+							<sort_order>20</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</sdk_version>
+					</fields>
+				</information>
+				<general translate="label comment">
+					<label>General</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>10</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<comment><![CDATA[To use this extension, a Trust Payments account is required. Sign up on <a href="https://www.trustpayments.com//" target="_blank">https://www.trustpayments.com/</a>.]]></comment>
+					<fields>
+						<api_data_heading translate="label">
+                            <label>Application User Details</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </api_data_heading>
+						<api_user_id translate="label comment">
+							<label>User Id</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+							<comment>The Application User needs to have full permissions in all spaces this shop is linked to.</comment>
+						</api_user_id>
+						<api_user_secret translate="label">
+							<label>Authentication Key</label>
+							<frontend_type>obscure</frontend_type>
+							<backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+							<sort_order>20</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+						</api_user_secret>
+						<space_heading translate="label">
+                            <label>Space Details</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>25</sort_order>
+                            <show_in_default>0</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </space_heading>
+						<space_id translate="label">
+							<label>Space Id</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>30</sort_order>
+							<show_in_default>0</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>0</show_in_store>
+						</space_id>
+						<space_view_id translate="label">
+							<label>Space View Id</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>40</sort_order>
+							<show_in_default>0</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<comment>The Space View Id allows to control the styling of the payment form and the payment page. It allows in multistore setups to adapt the payment form to different styling per substore without requiring a dedicated space.</comment>
+						</space_view_id>
+					</fields>
+				</general>
+				<email translate="label">
+					<label>Email</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>20</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<order translate="label comment">
+							<label>Send Order Email</label>
+							<frontend_type>select</frontend_type>
+							<sort_order>10</sort_order>
+							<comment>Send the Magento store's order email.</comment>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</order>
+					</fields>
+				</email>
+				<document translate="label">
+					<label>Document</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>30</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<customer_download_invoice translate="label comment">
+							<label>Customer Download: Invoice</label>
+							<frontend_type>select</frontend_type>
+							<sort_order>10</sort_order>
+							<comment>Allow customer's to download invoice documents.</comment>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</customer_download_invoice>
+						<customer_download_packing_slip translate="label comment">
+							<label>Customer Download: Packing Slip</label>
+							<frontend_type>select</frontend_type>
+							<sort_order>20</sort_order>
+							<comment>Allow customer's to download packing slips.</comment>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</customer_download_packing_slip>
+					</fields>
+				</document>
+				<line_item translate="label">
+					<label>Line Items</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>40</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<overwrite_shipping_description translate="label comment">
+							<label>Overwrite Shipping Description</label>
+							<frontend_type>select</frontend_type>
+							<sort_order>10</sort_order>
+							<comment>Use the custom description for the shipping line item.</comment>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</overwrite_shipping_description>
+						<custom_shipping_description translate="label comment">
+							<label>Custom Shipping Description</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>20</sort_order>
+							<comment>The description to set on the shipping line item.</comment>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<depends><overwrite_shipping_description>1</overwrite_shipping_description></depends>
+						</custom_shipping_description>
+						<enforce_consistency>
+							<label>Enforce Consistency</label>
+							<frontend_type>select</frontend_type>
+							<sort_order>30</sort_order>
+							<comment>Require that the line items of the transaction correspond to those of the purchase order in Magento. This may result in the Trust Payments payment methods not being available to the customer in certain cases. In return, it is ensured that only correct data is transmitted to Trust Payments.</comment>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</enforce_consistency>
+					</fields>
+				</line_item>
+			</groups>
+		</trustpayments_payment>
+	</sections>
+</config>

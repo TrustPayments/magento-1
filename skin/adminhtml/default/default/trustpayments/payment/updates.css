@@ -1,0 +1,34 @@
+/**
+ * Trust Payments Magento 1
+ *
+ * This Magento extension enables to process payments with Trust Payments (https://www.trustpayments.com//).
+ *
+ * @package TrustPayments_Payment
+ * @author customweb GmbH (http://www.customweb.com/)
+ * @license http://www.apache.org/licenses/LICENSE-2.0  Apache Software License (ASL 2.0)
+ */
+ 
+.trustpayments-payment-label-container {
+    margin-left: 5px;
+    margin-bottom: 20px;
+}
+
+.trustpayments-payment-label-group {
+    padding-left: 20px;
+    background: url(../../images/bg_collapse.gif) 0 4px no-repeat;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.trustpayments-payment-label-container.active .trustpayments-payment-label-group {
+    background-position: 0 -52px;
+}
+
+.trustpayments-payment-label-container table {
+    margin-left: 15px;
+    display: none;
+}
+
+.trustpayments-payment-label-container.active table {
+    display: block;
+}
