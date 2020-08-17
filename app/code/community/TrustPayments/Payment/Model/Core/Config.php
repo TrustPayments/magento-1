@@ -16,6 +16,16 @@
 class TrustPayments_Payment_Model_Core_Config extends Mage_Core_Model_Config
 {
     
+    protected $_cacheSections = array(
+        'admin'     => 0,
+        'adminhtml' => 0,
+        'crontab'   => 0,
+        'install'   => 0,
+        'stores'    => 1,
+        'websites'  => 0,
+        'wallee'    => 0
+    );
+    
     public function loadDb()
     {
         parent::loadDb();
