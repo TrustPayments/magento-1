@@ -13,7 +13,7 @@
 <config>
 	<modules>
 		<TrustPayments_Payment>
-			<version>1.0.68</version>
+			<version>1.0.69</version>
 		</TrustPayments_Payment>
 	</modules>
 	<global>
@@ -357,7 +357,7 @@
 	<default>
 		<trustpayments_payment>
 			<information>
-				<version>1.0.68</version>
+				<version>1.0.69</version>
 				<sdk_version>2.0.18</sdk_version>
 			</information>
 			<general>
