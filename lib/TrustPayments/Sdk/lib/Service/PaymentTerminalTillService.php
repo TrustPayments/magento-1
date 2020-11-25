@@ -27,14 +27,14 @@ use TrustPayments\Sdk\Http\HttpRequest;
 use TrustPayments\Sdk\ObjectSerializer;
 
 /**
- * PaymentConnectorService service
+ * PaymentTerminalTillService service
  *
  * @category Class
  * @package  TrustPayments\Sdk
  * @author   customweb GmbH
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache License v2
  */
-class PaymentConnectorService {
+class PaymentTerminalTillService {
 
 	/**
 	 * The API client instance.
@@ -67,43 +67,75 @@ class PaymentConnectorService {
 
 
 	/**
-	 * Operation all
+	 * Operation performTransaction
 	 *
-	 * All
+	 * Perform Payment Terminal Transaction
 	 *
+	 * @param int $space_id  (required)
+	 * @param int $transaction_id The ID of the transaction which is used to process with the terminal. (required)
+	 * @param int $terminal_id The ID of the terminal which should be used to process the transaction. (required)
+	 * @param string $language The language in which the messages should be rendered in. (optional)
 	 * @throws \TrustPayments\Sdk\ApiException
 	 * @throws \TrustPayments\Sdk\VersioningException
 	 * @throws \TrustPayments\Sdk\Http\ConnectionException
-	 * @return \TrustPayments\Sdk\Model\PaymentConnector[]
+	 * @return \TrustPayments\Sdk\Model\Transaction
 	 */
-	public function all() {
-		return $this->allWithHttpInfo()->getData();
+	public function performTransaction($space_id, $transaction_id, $terminal_id, $language = null) {
+		return $this->performTransactionWithHttpInfo($space_id, $transaction_id, $terminal_id, $language)->getData();
 	}
 
 	/**
-	 * Operation allWithHttpInfo
+	 * Operation performTransactionWithHttpInfo
 	 *
-	 * All
+	 * Perform Payment Terminal Transaction
 	 *
+	 * @param int $space_id  (required)
+	 * @param int $transaction_id The ID of the transaction which is used to process with the terminal. (required)
+	 * @param int $terminal_id The ID of the terminal which should be used to process the transaction. (required)
+	 * @param string $language The language in which the messages should be rendered in. (optional)
 	 * @throws \TrustPayments\Sdk\ApiException
 	 * @throws \TrustPayments\Sdk\VersioningException
 	 * @throws \TrustPayments\Sdk\Http\ConnectionException
 	 * @return ApiResponse
 	 */
-	public function allWithHttpInfo() {
+	public function performTransactionWithHttpInfo($space_id, $transaction_id, $terminal_id, $language = null) {
+		// verify the required parameter 'space_id' is set
+		if (is_null($space_id)) {
+			throw new \InvalidArgumentException('Missing the required parameter $space_id when calling performTransaction');
+		}
+		// verify the required parameter 'transaction_id' is set
+		if (is_null($transaction_id)) {
+			throw new \InvalidArgumentException('Missing the required parameter $transaction_id when calling performTransaction');
+		}
+		// verify the required parameter 'terminal_id' is set
+		if (is_null($terminal_id)) {
+			throw new \InvalidArgumentException('Missing the required parameter $terminal_id when calling performTransaction');
+		}
 		// header params
 		$headerParams = [];
 		$headerAccept = $this->apiClient->selectHeaderAccept(['application/json;charset=utf-8']);
 		if (!is_null($headerAccept)) {
 			$headerParams[HttpRequest::HEADER_KEY_ACCEPT] = $headerAccept;
 		}
-		$headerParams[HttpRequest::HEADER_KEY_CONTENT_TYPE] = $this->apiClient->selectHeaderContentType(['*/*']);
+		$headerParams[HttpRequest::HEADER_KEY_CONTENT_TYPE] = $this->apiClient->selectHeaderContentType(['application/json;charset=utf-8']);
 
 		// query params
 		$queryParams = [];
+		if (!is_null($space_id)) {
+			$queryParams['spaceId'] = $this->apiClient->getSerializer()->toQueryValue($space_id);
+		}
+		if (!is_null($transaction_id)) {
+			$queryParams['transactionId'] = $this->apiClient->getSerializer()->toQueryValue($transaction_id);
+		}
+		if (!is_null($terminal_id)) {
+			$queryParams['terminalId'] = $this->apiClient->getSerializer()->toQueryValue($terminal_id);
+		}
+		if (!is_null($language)) {
+			$queryParams['language'] = $this->apiClient->getSerializer()->toQueryValue($language);
+		}
 
 		// path params
-		$resourcePath = '/payment-connector/all';
+		$resourcePath = '/payment-terminal-till/perform-transaction';
 		// default format to json
 		$resourcePath = str_replace('{format}', 'json', $resourcePath);
 
@@ -119,23 +151,31 @@ class PaymentConnectorService {
 		}
 		// make the API Call
 		try {
-			$this->apiClient->setConnectionTimeout(ApiClient::CONNECTION_TIMEOUT);
+			$this->apiClient->setConnectionTimeout(90);
 			$response = $this->apiClient->callApi(
 				$resourcePath,
 				'GET',
 				$queryParams,
 				$httpBody,
 				$headerParams,
-				'\TrustPayments\Sdk\Model\PaymentConnector[]',
-				'/payment-connector/all'
+				'\TrustPayments\Sdk\Model\Transaction',
+				'/payment-terminal-till/perform-transaction'
 			);
-			return new ApiResponse($response->getStatusCode(), $response->getHeaders(), $this->apiClient->getSerializer()->deserialize($response->getData(), '\TrustPayments\Sdk\Model\PaymentConnector[]', $response->getHeaders()));
+			return new ApiResponse($response->getStatusCode(), $response->getHeaders(), $this->apiClient->getSerializer()->deserialize($response->getData(), '\TrustPayments\Sdk\Model\Transaction', $response->getHeaders()));
 		} catch (ApiException $e) {
 			switch ($e->getCode()) {
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\TrustPayments\Sdk\Model\PaymentConnector[]',
+                        '\TrustPayments\Sdk\Model\Transaction',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                break;
+                case 409:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\TrustPayments\Sdk\Model\ClientError',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -156,106 +196,10 @@ class PaymentConnectorService {
                     );
                     $e->setResponseObject($data);
                 break;
-			}
-			throw $e;
-		}
-	}
-
-	/**
-	 * Operation read
-	 *
-	 * Read
-	 *
-	 * @param int $id The id of the connector which should be returned. (required)
-	 * @throws \TrustPayments\Sdk\ApiException
-	 * @throws \TrustPayments\Sdk\VersioningException
-	 * @throws \TrustPayments\Sdk\Http\ConnectionException
-	 * @return \TrustPayments\Sdk\Model\PaymentConnector
-	 */
-	public function read($id) {
-		return $this->readWithHttpInfo($id)->getData();
-	}
-
-	/**
-	 * Operation readWithHttpInfo
-	 *
-	 * Read
-	 *
-	 * @param int $id The id of the connector which should be returned. (required)
-	 * @throws \TrustPayments\Sdk\ApiException
-	 * @throws \TrustPayments\Sdk\VersioningException
-	 * @throws \TrustPayments\Sdk\Http\ConnectionException
-	 * @return ApiResponse
-	 */
-	public function readWithHttpInfo($id) {
-		// verify the required parameter 'id' is set
-		if (is_null($id)) {
-			throw new \InvalidArgumentException('Missing the required parameter $id when calling read');
-		}
-		// header params
-		$headerParams = [];
-		$headerAccept = $this->apiClient->selectHeaderAccept(['application/json;charset=utf-8']);
-		if (!is_null($headerAccept)) {
-			$headerParams[HttpRequest::HEADER_KEY_ACCEPT] = $headerAccept;
-		}
-		$headerParams[HttpRequest::HEADER_KEY_CONTENT_TYPE] = $this->apiClient->selectHeaderContentType(['*/*']);
-
-		// query params
-		$queryParams = [];
-		if (!is_null($id)) {
-			$queryParams['id'] = $this->apiClient->getSerializer()->toQueryValue($id);
-		}
-
-		// path params
-		$resourcePath = '/payment-connector/read';
-		// default format to json
-		$resourcePath = str_replace('{format}', 'json', $resourcePath);
-
-		// form params
-		$formParams = [];
-		
-		// for model (json/xml)
-		$httpBody = '';
-		if (isset($tempBody)) {
-			$httpBody = $tempBody; // $tempBody is the method argument, if present
-		} elseif (!empty($formParams)) {
-			$httpBody = $formParams; // for HTTP post (form)
-		}
-		// make the API Call
-		try {
-			$this->apiClient->setConnectionTimeout(ApiClient::CONNECTION_TIMEOUT);
-			$response = $this->apiClient->callApi(
-				$resourcePath,
-				'GET',
-				$queryParams,
-				$httpBody,
-				$headerParams,
-				'\TrustPayments\Sdk\Model\PaymentConnector',
-				'/payment-connector/read'
-			);
-			return new ApiResponse($response->getStatusCode(), $response->getHeaders(), $this->apiClient->getSerializer()->deserialize($response->getData(), '\TrustPayments\Sdk\Model\PaymentConnector', $response->getHeaders()));
-		} catch (ApiException $e) {
-			switch ($e->getCode()) {
-                case 200:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\TrustPayments\Sdk\Model\PaymentConnector',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                break;
-                case 442:
+                case 543:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
                         '\TrustPayments\Sdk\Model\ClientError',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                break;
-                case 542:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\TrustPayments\Sdk\Model\ServerError',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);

@@ -6,14 +6,14 @@
  * This Magento extension enables to process payments with Trust Payments (https://www.trustpayments.com//).
  *
  * @package TrustPayments_Payment
- * @author customweb GmbH (http://www.customweb.com/)
+ * @author wallee AG (http://www.wallee.com/)
  * @license http://www.apache.org/licenses/LICENSE-2.0  Apache Software License (ASL 2.0)
  */
 -->
 <config>
 	<modules>
 		<TrustPayments_Payment>
-			<version>1.0.69</version>
+			<version>1.1.0</version>
 		</TrustPayments_Payment>
 	</modules>
 	<global>
@@ -357,8 +357,8 @@
 	<default>
 		<trustpayments_payment>
 			<information>
-				<version>1.0.69</version>
-				<sdk_version>2.0.18</sdk_version>
+				<version>1.1.0</version>
+				<sdk_version>2.1.4</sdk_version>
 			</information>
 			<general>
 				<base_gateway_url>https://ep.trustpayments.com/</base_gateway_url>
