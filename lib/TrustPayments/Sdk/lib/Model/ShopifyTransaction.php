@@ -22,7 +22,7 @@ namespace TrustPayments\Sdk\Model;
 use \TrustPayments\Sdk\ObjectSerializer;
 
 /**
- * ApplicationUserUpdate model
+ * ShopifyTransaction model
  *
  * @category    Class
  * @description 
@@ -30,7 +30,7 @@ use \TrustPayments\Sdk\ObjectSerializer;
  * @author      customweb GmbH
  * @license     http://www.apache.org/licenses/LICENSE-2.0 Apache License v2
  */
-class ApplicationUserUpdate extends AbstractApplicationUserUpdate 
+class ShopifyTransaction extends TransactionAwareEntity 
 {
     const DISCRIMINATOR = null;
 
@@ -39,7 +39,7 @@ class ApplicationUserUpdate extends AbstractApplicationUserUpdate
       *
       * @var string
       */
-    protected static $swaggerModelName = 'ApplicationUser.Update';
+    protected static $swaggerModelName = 'ShopifyTransaction';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -47,7 +47,14 @@ class ApplicationUserUpdate extends AbstractApplicationUserUpdate
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'id' => 'int',
+        'checkout_id' => 'string',
+        'created_on' => '\DateTime',
+        'integration' => '\TrustPayments\Sdk\Model\ShopifyIntegration',
+        'order_id' => 'string',
+        'order_name' => 'string',
+        'planned_purge_date' => '\DateTime',
+        'state' => '\TrustPayments\Sdk\Model\ShopifyTransactionState',
+        'transaction' => '\TrustPayments\Sdk\Model\Transaction',
         'version' => 'int'
     ];
 
@@ -57,8 +64,15 @@ class ApplicationUserUpdate extends AbstractApplicationUserUpdate
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'id' => 'int64',
-        'version' => 'int64'
+        'checkout_id' => null,
+        'created_on' => 'date-time',
+        'integration' => null,
+        'order_id' => null,
+        'order_name' => null,
+        'planned_purge_date' => 'date-time',
+        'state' => null,
+        'transaction' => null,
+        'version' => 'int32'
     ];
 
     /**
@@ -68,7 +82,14 @@ class ApplicationUserUpdate extends AbstractApplicationUserUpdate
      * @var string[]
      */
     protected static $attributeMap = [
-        'id' => 'id',
+        'checkout_id' => 'checkoutId',
+        'created_on' => 'createdOn',
+        'integration' => 'integration',
+        'order_id' => 'orderId',
+        'order_name' => 'orderName',
+        'planned_purge_date' => 'plannedPurgeDate',
+        'state' => 'state',
+        'transaction' => 'transaction',
         'version' => 'version'
     ];
 
@@ -78,7 +99,14 @@ class ApplicationUserUpdate extends AbstractApplicationUserUpdate
      * @var string[]
      */
     protected static $setters = [
-        'id' => 'setId',
+        'checkout_id' => 'setCheckoutId',
+        'created_on' => 'setCreatedOn',
+        'integration' => 'setIntegration',
+        'order_id' => 'setOrderId',
+        'order_name' => 'setOrderName',
+        'planned_purge_date' => 'setPlannedPurgeDate',
+        'state' => 'setState',
+        'transaction' => 'setTransaction',
         'version' => 'setVersion'
     ];
 
@@ -88,7 +116,14 @@ class ApplicationUserUpdate extends AbstractApplicationUserUpdate
      * @var string[]
      */
     protected static $getters = [
-        'id' => 'getId',
+        'checkout_id' => 'getCheckoutId',
+        'created_on' => 'getCreatedOn',
+        'integration' => 'getIntegration',
+        'order_id' => 'getOrderId',
+        'order_name' => 'getOrderName',
+        'planned_purge_date' => 'getPlannedPurgeDate',
+        'state' => 'getState',
+        'transaction' => 'getTransaction',
         'version' => 'getVersion'
     ];
 
@@ -106,7 +141,21 @@ class ApplicationUserUpdate extends AbstractApplicationUserUpdate
         parent::__construct($data);
 
         
-        $this->container['id'] = isset($data['id']) ? $data['id'] : null;
+        $this->container['checkout_id'] = isset($data['checkout_id']) ? $data['checkout_id'] : null;
+        
+        $this->container['created_on'] = isset($data['created_on']) ? $data['created_on'] : null;
+        
+        $this->container['integration'] = isset($data['integration']) ? $data['integration'] : null;
+        
+        $this->container['order_id'] = isset($data['order_id']) ? $data['order_id'] : null;
+        
+        $this->container['order_name'] = isset($data['order_name']) ? $data['order_name'] : null;
+        
+        $this->container['planned_purge_date'] = isset($data['planned_purge_date']) ? $data['planned_purge_date'] : null;
+        
+        $this->container['state'] = isset($data['state']) ? $data['state'] : null;
+        
+        $this->container['transaction'] = isset($data['transaction']) ? $data['transaction'] : null;
         
         $this->container['version'] = isset($data['version']) ? $data['version'] : null;
         
@@ -121,16 +170,6 @@ class ApplicationUserUpdate extends AbstractApplicationUserUpdate
     {
         $invalidProperties = parent::listInvalidProperties();
 
-        if (!is_null($this->container['name']) && (mb_strlen($this->container['name']) > 256)) {
-            $invalidProperties[] = "invalid value for 'name', the character length must be smaller than or equal to 256.";
-        }
-
-        if ($this->container['id'] === null) {
-            $invalidProperties[] = "'id' can't be null";
-        }
-        if ($this->container['version'] === null) {
-            $invalidProperties[] = "'version' can't be null";
-        }
         return $invalidProperties;
     }
 
@@ -212,25 +251,200 @@ class ApplicationUserUpdate extends AbstractApplicationUserUpdate
     
 
     /**
-     * Gets id
+     * Gets checkout_id
      *
-     * @return int
+     * @return string
      */
-    public function getId()
+    public function getCheckoutId()
     {
-        return $this->container['id'];
+        return $this->container['checkout_id'];
     }
 
     /**
-     * Sets id
+     * Sets checkout_id
      *
-     * @param int $id The ID is the primary key of the entity. The ID identifies the entity uniquely.
+     * @param string $checkout_id 
      *
      * @return $this
      */
-    public function setId($id)
+    public function setCheckoutId($checkout_id)
     {
-        $this->container['id'] = $id;
+        $this->container['checkout_id'] = $checkout_id;
+
+        return $this;
+    }
+    
+
+    /**
+     * Gets created_on
+     *
+     * @return \DateTime
+     */
+    public function getCreatedOn()
+    {
+        return $this->container['created_on'];
+    }
+
+    /**
+     * Sets created_on
+     *
+     * @param \DateTime $created_on The created on date indicates the date on which the entity was stored into the database.
+     *
+     * @return $this
+     */
+    public function setCreatedOn($created_on)
+    {
+        $this->container['created_on'] = $created_on;
+
+        return $this;
+    }
+    
+
+    /**
+     * Gets integration
+     *
+     * @return \TrustPayments\Sdk\Model\ShopifyIntegration
+     */
+    public function getIntegration()
+    {
+        return $this->container['integration'];
+    }
+
+    /**
+     * Sets integration
+     *
+     * @param \TrustPayments\Sdk\Model\ShopifyIntegration $integration 
+     *
+     * @return $this
+     */
+    public function setIntegration($integration)
+    {
+        $this->container['integration'] = $integration;
+
+        return $this;
+    }
+    
+
+    /**
+     * Gets order_id
+     *
+     * @return string
+     */
+    public function getOrderId()
+    {
+        return $this->container['order_id'];
+    }
+
+    /**
+     * Sets order_id
+     *
+     * @param string $order_id 
+     *
+     * @return $this
+     */
+    public function setOrderId($order_id)
+    {
+        $this->container['order_id'] = $order_id;
+
+        return $this;
+    }
+    
+
+    /**
+     * Gets order_name
+     *
+     * @return string
+     */
+    public function getOrderName()
+    {
+        return $this->container['order_name'];
+    }
+
+    /**
+     * Sets order_name
+     *
+     * @param string $order_name 
+     *
+     * @return $this
+     */
+    public function setOrderName($order_name)
+    {
+        $this->container['order_name'] = $order_name;
+
+        return $this;
+    }
+    
+
+    /**
+     * Gets planned_purge_date
+     *
+     * @return \DateTime
+     */
+    public function getPlannedPurgeDate()
+    {
+        return $this->container['planned_purge_date'];
+    }
+
+    /**
+     * Sets planned_purge_date
+     *
+     * @param \DateTime $planned_purge_date The planned purge date indicates when the entity is permanently removed. When the date is null the entity is not planned to be removed.
+     *
+     * @return $this
+     */
+    public function setPlannedPurgeDate($planned_purge_date)
+    {
+        $this->container['planned_purge_date'] = $planned_purge_date;
+
+        return $this;
+    }
+    
+
+    /**
+     * Gets state
+     *
+     * @return \TrustPayments\Sdk\Model\ShopifyTransactionState
+     */
+    public function getState()
+    {
+        return $this->container['state'];
+    }
+
+    /**
+     * Sets state
+     *
+     * @param \TrustPayments\Sdk\Model\ShopifyTransactionState $state 
+     *
+     * @return $this
+     */
+    public function setState($state)
+    {
+        $this->container['state'] = $state;
+
+        return $this;
+    }
+    
+
+    /**
+     * Gets transaction
+     *
+     * @return \TrustPayments\Sdk\Model\Transaction
+     */
+    public function getTransaction()
+    {
+        return $this->container['transaction'];
+    }
+
+    /**
+     * Sets transaction
+     *
+     * @param \TrustPayments\Sdk\Model\Transaction $transaction 
+     *
+     * @return $this
+     */
+    public function setTransaction($transaction)
+    {
+        $this->container['transaction'] = $transaction;
 
         return $this;
     }

@@ -30,7 +30,7 @@
 					<show_in_default>1</show_in_default>
 					<show_in_website>1</show_in_website>
 					<show_in_store>1</show_in_store>
-					<comment><![CDATA[If you need help setting up the Trust Payments extension, check out the <a href="https://plugin-documentation.ep.trustpayments.com/TrustPayments/magento-1/1.1.0/docs/en/documentation.html" target="_blank">documentation</a>.]]></comment>
+					<comment><![CDATA[If you need help setting up the Trust Payments extension, check out the <a href="https://plugin-documentation.ep.trustpayments.com/TrustPayments/magento-1/1.1.1/docs/en/documentation.html" target="_blank">documentation</a>.]]></comment>
 					<fields>
 						<version translate="label">
 							<label>Module Version</label>
