@@ -78,6 +78,14 @@ class TrustPayments_Payment_Model_Service_Token extends TrustPayments_Payment_Mo
 
             return;
         }
+        
+        if (! $tokenVersion->getPaymentConnectorConfiguration()) {
+            if ($info->getId()) {
+                $info->delete();
+            }
+            
+            return;
+        }
 
         $info->setCustomerId($tokenVersion->getToken()
             ->getCustomerId());
