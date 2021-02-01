@@ -99,7 +99,7 @@ class TrustPayments_Payment_Model_Service_LineItem extends TrustPayments_Payment
             $lineItem->setQuantity(1);
             $lineItem->setSku('shipping');
             $tax = $this->getShippingTax($invoice->getOrder());
-            if ($tax->getRate() > 0) {
+            if ($tax != null && $tax->getRate() > 0) {
                 $lineItem->setTaxes(array(
                     $tax
                 ));
@@ -359,7 +359,7 @@ class TrustPayments_Payment_Model_Service_LineItem extends TrustPayments_Payment
             $lineItem->setQuantity(1);
             $lineItem->setSku('shipping');
             $tax = $this->getShippingTax($entity);
-            if ($tax->getRate() > 0) {
+            if ($tax != null && $tax->getRate() > 0) {
                 $lineItem->setTaxes(array(
                     $tax
                 ));
@@ -398,6 +398,9 @@ class TrustPayments_Payment_Model_Service_LineItem extends TrustPayments_Payment
             $entity->getStore());
         $shippingTaxClass = Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_SHIPPING_TAX_CLASS,
             $entity->getStore());
+        if (! $shippingTaxClass) {
+            return null;
+        }
 
         /* @var Mage_Tax_Model_Class $taxClass */
         $taxClass = Mage::getModel('tax/class')->load($shippingTaxClass);
