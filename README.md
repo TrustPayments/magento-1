@@ -1,3 +1,5 @@
+> This plugin supports the Trust Enterprise Platform which can be identified by the URL for the platform ep.trustpayments.com.
+
 # Trust Payments Magento 1
 This repository contains the Magento 1 extension that enables to process payments with [Trust Payments](https://www.trustpayments.com//).
 
@@ -10,7 +12,7 @@ This repository contains the Magento 1 extension that enables to process payment
 
 ## Documentation
 
-* [Documentation](https://plugin-documentation.ep.trustpayments.com/TrustPayments/magento-1/1.1.3/docs/en/documentation.html)
+* [Documentation](https://plugin-documentation.ep.trustpayments.com/TrustPayments/magento-1/1.1.4/docs/en/documentation.html)
 
 ## Support
 
@@ -32,4 +34,4 @@ For Magento 1.6.x you need to install the [Magento compatibility module](https:/
 
 ## License
 
-Please see the [license file](https://github.com/TrustPayments/magento-1/blob/1.1.3/LICENSE) for more information.
+Please see the [license file](https://github.com/TrustPayments/magento-1/blob/1.1.4/LICENSE) for more information.
