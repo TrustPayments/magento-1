@@ -15,6 +15,11 @@
  */
 class TrustPayments_Payment_Model_Service_LineItem extends TrustPayments_Payment_Model_Service_Abstract
 {
+    /**
+     * Defines the maximum length that the name of the product can have.
+     * This limit is defined by the SDK.
+     */
+    const MAX_PRODUCT_NAME_LENGTH = 150;
 
     /**
      * Returns the line items for the given invoice, with reduced amounts to match the expected sum.
@@ -89,11 +94,15 @@ class TrustPayments_Payment_Model_Service_LineItem extends TrustPayments_Payment
             if (Mage::getStoreConfig('trustpayments_payment/line_item/overwrite_shipping_description',
                 $invoice->getStore())) {
                 $lineItem->setName(
-                    Mage::getStoreConfig('trustpayments_payment/line_item/custom_shipping_description',
-                        $invoice->getStore()));
+                    $this->processLineItemName(
+                        Mage::getStoreConfig('trustpayments_payment/line_item/custom_shipping_description',
+                        $invoice->getStore())
+                    )
+                );
             } else {
-                $lineItem->setName($invoice->getOrder()
-                    ->getShippingDescription());
+                $lineItem->setName(
+                    $this->processLineItemName($invoice->getOrder()->getShippingDescription())
+                );
             }
 
             $lineItem->setQuantity(1);
@@ -198,7 +207,7 @@ class TrustPayments_Payment_Model_Service_LineItem extends TrustPayments_Payment
     {
         $lineItem = new \TrustPayments\Sdk\Model\LineItemCreate();
         $lineItem->setAmountIncludingTax($this->roundAmount($productItem->getRowTotalInclTax(), $currency));
-        $lineItem->setName($productItem->getName());
+        $lineItem->setName($this->processLineItemName($productItem->getName()));
         $lineItem->setQuantity($productItem->getQty() ? $productItem->getQty() : $productItem->getQtyOrdered());
         $lineItem->setShippingRequired(! $productItem->getIsVirtual());
         $lineItem->setSku($productItem->getSku());
@@ -350,10 +359,13 @@ class TrustPayments_Payment_Model_Service_LineItem extends TrustPayments_Payment
             if (Mage::getStoreConfig('trustpayments_payment/line_item/overwrite_shipping_description',
                 $entity->getStore())) {
                 $lineItem->setName(
-                    Mage::getStoreConfig('trustpayments_payment/line_item/custom_shipping_description',
-                        $entity->getStore()));
+                    $this->processLineItemName(
+                        Mage::getStoreConfig('trustpayments_payment/line_item/custom_shipping_description',
+                        $entity->getStore())
+                    )
+                );
             } else {
-                $lineItem->setName($shippingInfo->getShippingDescription());
+                $lineItem->setName($this->processLineItemName($shippingInfo->getShippingDescription()));
             }
 
             $lineItem->setQuantity(1);
@@ -423,7 +435,7 @@ class TrustPayments_Payment_Model_Service_LineItem extends TrustPayments_Payment
             $lineItem = new \TrustPayments\Sdk\Model\LineItemCreate();
             $lineItem->setAmountIncludingTax(
                 $this->roundAmount($entity->getFoomanSurchargeAmount(), $this->getCurrencyCode($entity)));
-            $lineItem->setName($entity->getFoomanSurchargeDescription());
+            $lineItem->setName($this->processLineItemName($entity->getFoomanSurchargeDescription()));
             $lineItem->setQuantity(1);
             $lineItem->setSku('surcharge');
             $tax = $this->getSurchargeTax($entity);
@@ -482,8 +494,7 @@ class TrustPayments_Payment_Model_Service_LineItem extends TrustPayments_Payment
             $lineItem = new \TrustPayments\Sdk\Model\LineItemCreate();
             $lineItem->setAmountIncludingTax(
                 $this->roundAmount(- 1 * $entity->getGiftCardsAmount(), $this->getCurrencyCode($entity)));
-            $lineItem->setName($this->getHelper()
-                ->__('Giftcard'));
+            $lineItem->setName($this->processLineItemName($this->getHelper()->__('Giftcard')));
             $lineItem->setQuantity(1);
             $lineItem->setSku('giftcard');
             $lineItem->setType(\TrustPayments\Sdk\Model\LineItemType::DISCOUNT);
@@ -515,8 +526,9 @@ class TrustPayments_Payment_Model_Service_LineItem extends TrustPayments_Payment
                 $lineItem = new \TrustPayments\Sdk\Model\LineItemCreate();
                 $lineItem->setAmountIncludingTax(
                     $this->roundAmount(- 1 * $giftcard->getGiftcardAmount(), $this->getCurrencyCode($entity)));
-                $lineItem->setName($this->getHelper()
-                    ->__('Giftcard (%s)', $giftcardModel->getCode()));
+                $lineItem->setName($this->processLineItemName(
+                    $this->getHelper()->__('Giftcard (%s)', $giftcardModel->getCode())
+                ));
                 $lineItem->setQuantity(1);
                 $lineItem->setSku('giftcard_' . $giftcard->getGiftcardId());
                 $lineItem->setType(\TrustPayments\Sdk\Model\LineItemType::DISCOUNT);
@@ -556,7 +568,9 @@ class TrustPayments_Payment_Model_Service_LineItem extends TrustPayments_Payment
     protected function cleanLineItem(\TrustPayments\Sdk\Model\LineItemCreate $lineItem)
     {
         $lineItem->setSku($this->fixLength($this->removeLinebreaks($lineItem->getSku()), 200));
-        $lineItem->setName($this->fixLength($this->removeLinebreaks($lineItem->getName()), 150));
+        $lineItem->setName($this->processLineItemName(
+            $this->fixLength($this->removeLinebreaks($lineItem->getName()), self::MAX_PRODUCT_NAME_LENGTH)
+        ));
         return $lineItem;
     }
 
@@ -583,5 +597,26 @@ class TrustPayments_Payment_Model_Service_LineItem extends TrustPayments_Payment
     protected function getLineItemHelper()
     {
         return Mage::helper('trustpayments_payment/lineItem');
+    }
+
+    /**
+     * Checks that the name meets the SDK's expected length
+     * This is an auxiliar method.
+     * 
+     * As the SDK defines a maximum limit for the length of the product name,
+     * this function shortens this name.
+     *
+     * @see \Wallee\Sdk\Model\LineItemCreate::setName()
+     *
+     * @param string $name
+     *   The name to be processed.
+     * @return string
+     *   Returns the name shorten if needed. 
+     */
+    protected function processLineItemName($name) {
+        if (strlen($name) > self::MAX_PRODUCT_NAME_LENGTH) {
+            $name = substr($name, 0, self::MAX_PRODUCT_NAME_LENGTH);
+        }
+        return $name;
     }
 }
