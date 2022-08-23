@@ -1,5 +1,10 @@
 <?php
 
+use \TrustPayments\Sdk\Model\Gender;
+use \TrustPayments\Sdk\Model\Transaction;
+use \TrustPayments\Sdk\Model\TransactionState;
+use \TrustPayments\Sdk\Service\TransactionService;
+
 /**
  * Trust Payments Magento 1
  *
@@ -19,60 +24,69 @@ class TrustPayments_Payment_Model_Webhook_Transaction extends TrustPayments_Paym
     /**
      *
      * @see TrustPayments_Payment_Model_Webhook_AbstractOrderRelated::loadEntity()
-     * @return \TrustPayments\Sdk\Model\Transaction
+     * @return Transaction
      */
     protected function loadEntity(TrustPayments_Payment_Model_Webhook_Request $request)
     {
-        $transactionService = new \TrustPayments\Sdk\Service\TransactionService(
+        $transactionService = new TransactionService(
             Mage::helper('trustpayments_payment')->getApiClient());
         return $transactionService->read($request->getSpaceId(), $request->getEntityId());
     }
 
     protected function getTransactionId($transaction)
     {
-        /* @var \TrustPayments\Sdk\Model\Transaction $transaction */
+        /* @var Transaction $transaction */
         return $transaction->getId();
     }
 
     protected function processOrderRelatedInner(Mage_Sales_Model_Order $order, $transaction)
     {
-        /* @var \TrustPayments\Sdk\Model\Transaction $transaction */
+        /* @var Transaction $transaction */
         /* @var TrustPayments_Payment_Model_Entity_TransactionInfo $transactionInfo */
         $transactionInfo = Mage::getModel('trustpayments_payment/entity_transactionInfo')->loadByOrder($order);
-        if ($transaction->getState() != $transactionInfo->getState()) {
-            switch ($transaction->getState()) {
-                case \TrustPayments\Sdk\Model\TransactionState::AUTHORIZED:
-                case \TrustPayments\Sdk\Model\TransactionState::COMPLETED:
-                    $this->authorize($transaction, $order);
-                    break;
-                case \TrustPayments\Sdk\Model\TransactionState::DECLINE:
-                    $this->authorize($transaction, $order);
-                    $this->decline($transaction, $order);
-                    break;
-                case \TrustPayments\Sdk\Model\TransactionState::FAILED:
-                    $this->failed($transaction, $order);
-                    break;
-                case \TrustPayments\Sdk\Model\TransactionState::FULFILL:
-                    $this->authorize($transaction, $order);
-                    $this->fulfill($transaction, $order);
-                    break;
-                case \TrustPayments\Sdk\Model\TransactionState::VOIDED:
-                    $this->authorize($transaction, $order);
-                    $this->voided($transaction, $order);
-                    break;
-                default:
-                    // Nothing to do.
-                    break;
+
+        $finalStates = [
+            TransactionState::FAILED,
+            TransactionState::VOIDED,
+            TransactionState::DECLINE,
+            TransactionState::FULFILL
+        ];
+
+        if (!in_array($transactionInfo->getState(), $finalStates)) {
+            /* @var TrustPayments_Payment_Model_Service_Transaction $transactionStoreService */
+            $transactionStoreService = Mage::getSingleton('trustpayments_payment/service_transaction');
+            $transactionStoreService->updateTransactionInfo($transaction, $order);
+
+            if ($transaction->getState() != $transactionInfo->getState()) {
+                switch ($transaction->getState()) {
+                    case TransactionState::AUTHORIZED:
+                    case TransactionState::COMPLETED:
+                        $this->authorize($transaction, $order);
+                        break;
+                    case TransactionState::DECLINE:
+                        $this->authorize($transaction, $order);
+                        $this->decline($transaction, $order);
+                        break;
+                    case TransactionState::FAILED:
+                        $this->failed($transaction, $order);
+                        break;
+                    case TransactionState::FULFILL:
+                        $this->authorize($transaction, $order);
+                        $this->fulfill($transaction, $order);
+                        break;
+                    case TransactionState::VOIDED:
+                        $this->authorize($transaction, $order);
+                        $this->voided($transaction, $order);
+                        break;
+                    default:
+                        // Nothing to do.
+                        break;
+                }
             }
         }
-
-        /* @var TrustPayments_Payment_Model_Service_Transaction $transactionStoreService */
-        $transactionStoreService = Mage::getSingleton('trustpayments_payment/service_transaction');
-        $transactionStoreService->updateTransactionInfo($transaction, $order);
     }
 
-    protected function authorize(\TrustPayments\Sdk\Model\Transaction $transaction,
-        Mage_Sales_Model_Order $order)
+    protected function authorize(Transaction $transaction, Mage_Sales_Model_Order $order)
     {
         if (! $order->getTrustpaymentsAuthorized()) {
             $order->getPayment()
@@ -80,7 +94,7 @@ class TrustPayments_Payment_Model_Webhook_Transaction extends TrustPayments_Paym
                 ->setIsTransactionClosed(false);
             $order->getPayment()->registerAuthorizationNotification($transaction->getAuthorizationAmount());
             $this->sendOrderEmail($order);
-            if ($transaction->getState() != \TrustPayments\Sdk\Model\TransactionState::FULFILL) {
+            if ($transaction->getState() != TransactionState::FULFILL) {
                 $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, 'processing_trustpayments',
                     Mage::helper('trustpayments_payment')->__(
                         'The order should not be fulfilled yet, as the payment is not guaranteed.'));
@@ -96,7 +110,7 @@ class TrustPayments_Payment_Model_Webhook_Transaction extends TrustPayments_Paym
         }
     }
 
-    protected function decline(\TrustPayments\Sdk\Model\Transaction $transaction, Mage_Sales_Model_Order $order)
+    protected function decline(Transaction $transaction, Mage_Sales_Model_Order $order)
     {
         if ($order->getState() != Mage_Sales_Model_Order::STATE_CANCELED) {
             $order->setTrustpaymentsPaymentInvoiceAllowManipulation(true);
@@ -107,7 +121,7 @@ class TrustPayments_Payment_Model_Webhook_Transaction extends TrustPayments_Paym
         $order->save();
     }
 
-    protected function failed(\TrustPayments\Sdk\Model\Transaction $transaction, Mage_Sales_Model_Order $order)
+    protected function failed(Transaction $transaction, Mage_Sales_Model_Order $order)
     {
         $invoice = $this->getInvoiceForTransaction($transaction->getLinkedSpaceId(), $transaction->getId(), $order);
         if ($invoice != null && $invoice->canCancel()) {
@@ -124,7 +138,7 @@ class TrustPayments_Payment_Model_Webhook_Transaction extends TrustPayments_Paym
         }
     }
 
-    protected function fulfill(\TrustPayments\Sdk\Model\Transaction $transaction, Mage_Sales_Model_Order $order)
+    protected function fulfill(Transaction $transaction, Mage_Sales_Model_Order $order)
     {
         if ($order->getState() == Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW) {
             $order->getPayment()->setNotificationResult(true);
@@ -138,7 +152,7 @@ class TrustPayments_Payment_Model_Webhook_Transaction extends TrustPayments_Paym
         $order->save();
     }
 
-    protected function voided(\TrustPayments\Sdk\Model\Transaction $transaction, Mage_Sales_Model_Order $order)
+    protected function voided(Transaction $transaction, Mage_Sales_Model_Order $order)
     {
         $order->getPayment()->registerVoidNotification();
         $invoice = $this->getInvoiceForTransaction($transaction->getLinkedSpaceId(), $transaction->getId(), $order);
@@ -187,8 +201,7 @@ class TrustPayments_Payment_Model_Webhook_Transaction extends TrustPayments_Paym
         return null;
     }
 
-    protected function updateShopCustomer(\TrustPayments\Sdk\Model\Transaction $transaction,
-        Mage_Sales_Model_Order $order)
+    protected function updateShopCustomer(Transaction $transaction, Mage_Sales_Model_Order $order)
     {
         if ($order->getCustomerIsGuest() || $order->getBillingAddress() == null ||
             ! $order->getBillingAddress()->getCustomerAddressId()) {
@@ -211,8 +224,7 @@ class TrustPayments_Payment_Model_Webhook_Transaction extends TrustPayments_Paym
         $customer->save();
     }
 
-    protected function updateDateOfBirth(Mage_Customer_Model_Customer $customer,
-        \TrustPayments\Sdk\Model\Transaction $transaction)
+    protected function updateDateOfBirth(Mage_Customer_Model_Customer $customer, Transaction $transaction)
     {
         if ($customer->getDob() == null && $transaction->getBillingAddress()->getDateOfBirth() != null) {
             $customer->setDob($transaction->getBillingAddress()
@@ -220,8 +232,7 @@ class TrustPayments_Payment_Model_Webhook_Transaction extends TrustPayments_Paym
         }
     }
 
-    protected function updateSalutation(Mage_Customer_Model_Customer $customer,
-        Mage_Customer_Model_Address $billingAddress, \TrustPayments\Sdk\Model\Transaction $transaction)
+    protected function updateSalutation(Mage_Customer_Model_Customer $customer, Mage_Customer_Model_Address $billingAddress, Transaction $transaction)
     {
         if ($transaction->getBillingAddress()->getSalutation() != null) {
             if ($customer->getPrefix() == null) {
@@ -236,20 +247,19 @@ class TrustPayments_Payment_Model_Webhook_Transaction extends TrustPayments_Paym
         }
     }
 
-    protected function updateGender(Mage_Customer_Model_Customer $customer,
-        \TrustPayments\Sdk\Model\Transaction $transaction)
+    protected function updateGender(Mage_Customer_Model_Customer $customer, Transaction $transaction)
     {
         if ($customer->getGender() == null && $transaction->getBillingAddress()->getGender() != null) {
-            if ($transaction->getBillingAddress()->getGender() == \TrustPayments\Sdk\Model\Gender::MALE) {
+            if ($transaction->getBillingAddress()->getGender() == Gender::MALE) {
                 $customer->setGender(1);
-            } elseif ($transaction->getBillingAddress()->getGender() == \TrustPayments\Sdk\Model\Gender::FEMALE) {
+            } elseif ($transaction->getBillingAddress()->getGender() == Gender::FEMALE) {
                 $customer->setGender(2);
             }
         }
     }
 
     protected function updateSalesTaxNumber(Mage_Customer_Model_Customer $customer,
-        Mage_Customer_Model_Address $billingAddress, \TrustPayments\Sdk\Model\Transaction $transaction)
+        Mage_Customer_Model_Address $billingAddress, Transaction $transaction)
     {
         if ($transaction->getBillingAddress()->getSalesTaxNumber() != null) {
             if ($customer->getTaxvat() == null) {
@@ -265,7 +275,7 @@ class TrustPayments_Payment_Model_Webhook_Transaction extends TrustPayments_Paym
     }
 
     protected function updateCompany(Mage_Customer_Model_Customer $customer, Mage_Customer_Model_Address $billingAddress,
-        \TrustPayments\Sdk\Model\Transaction $transaction)
+        Transaction $transaction)
     {
         if ($billingAddress->getCompany() == null && $transaction->getBillingAddress()->getOrganizationName() != null) {
             $billingAddress->setCompany($transaction->getBillingAddress()
