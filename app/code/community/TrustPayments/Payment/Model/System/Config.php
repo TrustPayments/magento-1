@@ -78,7 +78,7 @@ class TrustPayments_Payment_Model_System_Config
         if (Mage::getConfig() instanceof TrustPayments_Payment_Model_Core_Config) {
             $configLoaded = Mage::getConfig()->getNode('trustpayments/config_loaded');
             if (!$configLoaded) {
-                Mage::getModel('wallee_payment/observer_core')->addAutoloader();
+                Mage::getModel('trustpayments_payment/observer_core')->addAutoloader();
                 Mage::app()->reinitStores();
                 
                 $configValues = $this->getConfigValues();
