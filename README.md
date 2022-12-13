@@ -12,7 +12,7 @@ This repository contains the Magento 1 extension that enables to process payment
 
 ## Documentation
 
-* [Documentation](https://plugin-documentation.ep.trustpayments.com/TrustPayments/magento-1/1.1.11/docs/en/documentation.html)
+* [Documentation](https://plugin-documentation.ep.trustpayments.com/TrustPayments/magento-1/1.1.12/docs/en/documentation.html)
 
 ## Support
 
@@ -34,4 +34,4 @@ For Magento 1.6.x you need to install the [Magento compatibility module](https:/
 
 ## License
 
-Please see the [license file](https://github.com/TrustPayments/magento-1/blob/1.1.11/LICENSE) for more information.
+Please see the [license file](https://github.com/TrustPayments/magento-1/blob/1.1.12/LICENSE) for more information.
